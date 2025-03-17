@@ -78,12 +78,6 @@ class SftpBackup:
         except IOError as e:
             print("Can't Download " + e)
 
-    def get_dirs(self):
-        return self.dirs
-
-    def get_files(self):
-        return self.files
-
     def close(self):
         self.sftp_connect.close()
 
