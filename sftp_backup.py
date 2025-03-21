@@ -1,5 +1,6 @@
 import argparse
 import configparser
+import datetime
 import os
 import sys
 
@@ -14,7 +15,7 @@ def createDir(remotepath, localpath, dirs_list):
 
 
 class SftpBackup:
-    """ssh接続してバックアップするクラス
+    """ssh接続でファイルをuploadするクラス
     http://docs.paramiko.org/en/3.2/api/sftp.html
     https://medium.com/@thapa.parmeshwor/sftp-upload-and-download-using-python-paramiko-a594e81cbcd8
     """
@@ -25,7 +26,9 @@ class SftpBackup:
     dirs = []
 
     def __init__(self, host, port, user, auth_data):
-        """クラスが生成された時に最初に呼ばれる"""
+        """クラスが生成された時に最初に呼ばれる
+        - サーバ接続のためパスフレーズ無し
+        """
         # 接続情報
         self.host = host
         self.port = port
@@ -33,7 +36,9 @@ class SftpBackup:
         self.key_file = auth_data["key_file"]
         self.passphrase = auth_data["passphrase"]
         paramiko.util.log_to_file("/tmp/paramiko.log")
-        cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
+        # cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
+        # パスフレーズ無しで秘密鍵による接続
+        cc = self.create_connection(self.host, self.port, self.user, self.key_file, None)
         if not cc:
             sys.exit(1)
 
@@ -57,10 +62,10 @@ class SftpBackup:
             self.sftp_connect = paramiko.SFTPClient.from_transport(transport)
             return True
         except paramiko.ssh_exception.SSHException as e:
-            print(f"❌ SSHエラーが発生しました: {e}")
+            print(f"SSHエラーが発生しました: {e}")
             return False
         except paramiko.ssh_exception.AuthenticationException:
-            print("❌ 認証エラー！秘密鍵が正しいか確認してください。")
+            print("認証エラー！秘密鍵が正しいか確認してください。")
             return False
 
     def is_file_exists(self, localpath):
@@ -80,6 +85,13 @@ class SftpBackup:
 
     def close(self):
         self.sftp_connect.close()
+
+
+def add_datetime(fn):
+    """バックアップファイル名に日付＋時間を付加する"""
+    date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{fn}_{date_str}.zip"
+    return filename
 
 
 if __name__ == "__main__":
@@ -109,10 +121,10 @@ if __name__ == "__main__":
     auth_data["key_file"] = config_ini["DEFAULT"]["KEY_FILE"].strip()
     auth_data["passphrase"] = config_ini["DEFAULT"]["PASSPHRASE"].replace('"', "").strip()
 
-    # create sftpclient object.
     with SftpBackup(host, port, user, auth_data) as sftp_backup:
         # ----------------------------------------------------------
-        # ファイルアップロード
+        # ファイルアップロード処理
         # ----------------------------------------------------------
         if os.path.exists(localpath):
+            remotepatgh = add_datetime(remotepath)
             sftp_backup.upload_file(remotepath, localpath)
