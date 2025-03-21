@@ -37,10 +37,10 @@ class SftpBackup:
         self.key_file = auth_data["key_file"]
         self.passphrase = auth_data["passphrase"]
         paramiko.util.log_to_file("/tmp/paramiko.log")
-        # パスフレーズ有りで秘密鍵による接続（test用）
-        cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
-        # パスフレーズ無しで秘密鍵による接続
-        # cc = self.create_connection(self.host, self.port, self.user, self.key_file, None)
+        # # パスフレーズ有りで秘密鍵による接続（test用）
+        # cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
+        # パスフレーズ無しで秘密鍵による接続（サーバで作成した秘密鍵はバックアップ専用なのでパスフレーズ無し）
+        cc = self.create_connection(self.host, self.port, self.user, self.key_file, None)
         if not cc:
             sys.exit(1)
 
@@ -128,6 +128,7 @@ if __name__ == "__main__":
             date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
             remotepath = str(Path(remotepath).with_suffix(""))
             remotepath = f"{remotepath}_{date_str}.zip"
+            # バックアップ処理
             sftp_backup.upload_file(remotepath, localpath)
         else:
             print(f"{localpath}が存在しません")
