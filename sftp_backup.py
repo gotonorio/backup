@@ -35,7 +35,7 @@ class SftpBackup:
         self.port = port
         self.user = user
         self.key_file = auth_data["key_file"]
-        self.passphrase = auth_data["passphrase"]
+        # self.passphrase = auth_data["passphrase"]
         paramiko.util.log_to_file("/tmp/paramiko.log")
         # # パスフレーズ有りで秘密鍵による接続（test用）
         # cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
@@ -99,15 +99,20 @@ if __name__ == "__main__":
     PORT = port_number
     USER = user_name
     KEY_FILE = id_rsa
-    PASSPHRASE = passphrase
-    REMOTE_PATH = remote_filename
-    LOCAL_PATH = local_filename
+    PASSPHRASE = passphrase（自動バックアップするなら、パスフレーズ無しで秘密鍵を作成する）
+    REMOTE_PATH = remote_filename（バックアップ側のフルパスファイル名）
+    LOCAL_PATH = local_filename（バックアップするファイル名）
     """
-    # argparser
-    parser = argparse.ArgumentParser()
-    parser.add_argument("config_file")
-    args = parser.parse_args()
-    # read config_file
+    # config_fileを読み込むためにargparseを設定する
+    try:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("config_file", help="設定ファイルのパスを指定してください。")
+        args = parser.parse_args()
+    except SystemExit:
+        print("config fileが指定されていません!!")
+        exit(-1)
+    # コマンドライン引数で指定された設定ファイル（INIファイル）を読み込み
+    # DEFAULTセクションの設定値を変数に設定する
     auth_data = {}
     config_ini = configparser.ConfigParser()
     config_ini.read(args.config_file, encoding="utf-8")
