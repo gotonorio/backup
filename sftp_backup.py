@@ -1,8 +1,9 @@
 import argparse
 import configparser
-import datetime
 import os
 import sys
+from datetime import datetime
+from pathlib import Path
 
 import paramiko
 
@@ -36,9 +37,10 @@ class SftpBackup:
         self.key_file = auth_data["key_file"]
         self.passphrase = auth_data["passphrase"]
         paramiko.util.log_to_file("/tmp/paramiko.log")
-        # cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
+        # パスフレーズ有りで秘密鍵による接続（test用）
+        cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
         # パスフレーズ無しで秘密鍵による接続
-        cc = self.create_connection(self.host, self.port, self.user, self.key_file, None)
+        # cc = self.create_connection(self.host, self.port, self.user, self.key_file, None)
         if not cc:
             sys.exit(1)
 
@@ -87,15 +89,11 @@ class SftpBackup:
         self.sftp_connect.close()
 
 
-def add_datetime(fn):
-    """バックアップファイル名に日付＋時間を付加する"""
-    date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{fn}_{date_str}.zip"
-    return filename
-
-
 if __name__ == "__main__":
-    """ config_file
+    """バックアップ処理
+    usage
+    $ python sftp_backup.py configファイル名
+    - config_file
     [DEFAULT]
     HOST = example.com
     PORT = port_number
@@ -126,5 +124,10 @@ if __name__ == "__main__":
         # ファイルアップロード処理
         # ----------------------------------------------------------
         if os.path.exists(localpath):
-            remotepatgh = add_datetime(remotepath)
+            """バックアップファイル名（remotepath）に日時を付加して拡張子zipで保存する"""
+            date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+            remotepath = str(Path(remotepath).with_suffix(""))
+            remotepath = f"{remotepath}_{date_str}.zip"
             sftp_backup.upload_file(remotepath, localpath)
+        else:
+            print(f"{localpath}が存在しません")
