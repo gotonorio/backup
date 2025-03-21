@@ -35,12 +35,12 @@ class SftpBackup:
         self.port = port
         self.user = user
         self.key_file = auth_data["key_file"]
-        # self.passphrase = auth_data["passphrase"]
+        self.passphrase = auth_data["passphrase"]
+        if self.passphrase == "":
+            self.passphrase = None
         paramiko.util.log_to_file("/tmp/paramiko.log")
-        # # パスフレーズ有りで秘密鍵による接続（test用）
-        # cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
-        # パスフレーズ無しで秘密鍵による接続（サーバで作成した秘密鍵はバックアップ専用なのでパスフレーズ無し）
-        cc = self.create_connection(self.host, self.port, self.user, self.key_file, None)
+        # 秘密鍵による接続
+        cc = self.create_connection(self.host, self.port, self.user, self.key_file, self.passphrase)
         if not cc:
             sys.exit(1)
 
