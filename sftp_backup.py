@@ -117,8 +117,8 @@ if __name__ == "__main__":
     except SystemExit:
         print("config fileが指定されていません!!")
         exit(-1)
-    # コマンドライン引数で指定された設定ファイル（INIファイル）を読み込み
-    # DEFAULTセクションの設定値を変数に設定する
+    # configparserでコマンドライン引数で指定された設定ファイル（INIファイル）を読み込み
+    # 【DEFAULT】セクションの設定値を変数に設定する
     auth_data = {}
     config_ini = configparser.ConfigParser()
     config_ini.read(args.config_file, encoding="utf-8")
