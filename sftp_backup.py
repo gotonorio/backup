@@ -125,21 +125,30 @@ if __name__ == "__main__":
     host = config_ini["DEFAULT"]["HOST"].strip()
     port = int(config_ini["DEFAULT"]["PORT"])
     user = config_ini["DEFAULT"]["USER"].strip()
-    remotepath = config_ini["DEFAULT"]["REMOTE_PATH"].strip()
-    localpath = config_ini["DEFAULT"]["LOCAL_PATH"].strip()
     auth_data["key_file"] = config_ini["DEFAULT"]["KEY_FILE"].strip()
     auth_data["passphrase"] = config_ini["DEFAULT"]["PASSPHRASE"].replace('"', "").strip()
 
+    # セクションごとのデータを辞書に変換し、リストに格納（Listの内包表記）
+    data_list = [
+        {
+            "section": section,  # セクション名（AUDIT, WAREHOUSE, FACILITY など）
+            "REMOTE_PATH": config_ini.get(section, "REMOTE_PATH"),
+            "LOCAL_PATH": config_ini.get(section, "LOCAL_PATH"),
+        }
+        for section in config_ini.sections()
+    ]
+
     with SftpBackup(host, port, user, auth_data) as sftp_backup:
-        # ----------------------------------------------------------
-        # ファイルアップロード処理
-        # ----------------------------------------------------------
-        if os.path.exists(localpath):
-            """バックアップファイル名（remotepath）に日時を付加して拡張子zipで保存する"""
-            date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-            remotepath = str(Path(remotepath).with_suffix(""))
-            remotepath = f"{remotepath}_{date_str}.zip"
-            # バックアップ処理
-            sftp_backup.upload_file(remotepath, localpath)
-        else:
-            print(f"{localpath}が存在しません")
+        for data_dict in data_list:
+            # ファイルアップロード処理
+            if os.path.exists(data_dict["LOCAL_PATH"]):
+                """バックアップファイル名（remotepath）に日時を付加して拡張子zipで保存する"""
+                date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+                remotepath = str(Path(data_dict["REMOTE_PATH"]).with_suffix(""))
+                remotepath = f"{remotepath}_{date_str}.zip"
+                print(f"{data_dict['LOCAL_PATH']} -> {remotepath}")
+                # バックアップ処理
+                sftp_backup.upload_file(remotepath, data_dict["LOCAL_PATH"])
+            else:
+                print(f"バックアップする「{data_dict['LOCAL_PATH']}」が存在しません！")
+
