@@ -128,7 +128,7 @@ if __name__ == "__main__":
     auth_data["key_file"] = config_ini["DEFAULT"]["KEY_FILE"].strip()
     auth_data["passphrase"] = config_ini["DEFAULT"]["PASSPHRASE"].replace('"', "").strip()
 
-    # セクションごとのデータを辞書に変換し、リストに格納（Listの内包表記）
+    # セクションごとのconfigデータを辞書に変換し、リストに格納（Listの内包表記）
     data_list = [
         {
             "section": section,  # セクション名（AUDIT, WAREHOUSE, FACILITY など）
