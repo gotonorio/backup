@@ -1,3 +1,6 @@
+#
+#  Programming by N.Goto 2025-03-22
+#
 import argparse
 import configparser
 import os
@@ -36,6 +39,7 @@ class SftpBackup:
         self.user = user
         self.key_file = auth_data["key_file"]
         self.passphrase = auth_data["passphrase"]
+        # 自動バックアップ用にパスフレーズ無しに対応
         if self.passphrase == "":
             self.passphrase = None
         paramiko.util.log_to_file("/tmp/paramiko.log")
@@ -93,14 +97,16 @@ if __name__ == "__main__":
     """バックアップ処理
     usage
     $ python sftp_backup.py configファイル名
-    - config_file
+    自動バックアップするために、秘密鍵はパスフレーズ無しで作成しておく）
+
+    config_file
     [DEFAULT]
     HOST = example.com
     PORT = port_number
     USER = user_name
     KEY_FILE = id_rsa
-    PASSPHRASE = passphrase（自動バックアップするなら、パスフレーズ無しで秘密鍵を作成する）
-    REMOTE_PATH = remote_filename（バックアップ側のフルパスファイル名）
+    PASSPHRASE = passphrase（「""」を設定で、パスフレーズ無しの秘密鍵に対応）
+    REMOTE_PATH = remote_filename（LOCAL_PATHに日時を追加して、拡張子をzipに置き換えてアップロードする）
     LOCAL_PATH = local_filename（バックアップするファイル名）
     """
     # config_fileを読み込むためにargparseを設定する
