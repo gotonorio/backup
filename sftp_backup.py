@@ -1,5 +1,5 @@
 """
-管理組合サーバのデータ（sqlite3データベース）バックアップ処理を行う。
+localサーバのデータをremoteサーバにアップロード処理を行う。
 Programming by N.Goto 2025-03-22
 使用条件
     1. localサーバからremoteサーバに秘密鍵でssh接続できること。
@@ -24,9 +24,6 @@ class SftpBackup:
     """
 
     sftp_connect = None
-    ssh_connect = None
-    files = []
-    dirs = []
 
     def __init__(self, host, port, user, auth_data):
         """クラスが生成された時に最初に呼ばれる
