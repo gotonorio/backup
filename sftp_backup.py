@@ -1,6 +1,12 @@
-#
-#  Programming by N.Goto 2025-03-22
-#
+"""
+管理組合サーバのデータ（sqlite3データベース）バックアップ処理を行う。
+Programming by N.Goto 2025-03-22
+使用条件
+    1. localサーバからremoteサーバに秘密鍵でssh接続できること。
+    2. remoteサーバにはバックアップファイル用のディレクトリが存在すること。
+    3. ファイル名はremote側もlocal側もFullpathで指定すること。
+"""
+
 import argparse
 import configparser
 import os
@@ -9,13 +15,6 @@ from datetime import datetime
 from pathlib import Path
 
 import paramiko
-
-
-def createDir(remotepath, localpath, dirs_list):
-    for dir_path in dirs_list:
-        dir_name = dir_path.replace(remotepath, "")
-        local_dir = localpath + dir_name
-        os.makedirs(local_dir, exist_ok=True)
 
 
 class SftpBackup:
@@ -87,7 +86,7 @@ class SftpBackup:
         try:
             self.sftp_connect.put(localpath, remotepath, callback=None)
         except IOError as e:
-            print("Can't Download " + e)
+            print("Can't Upload " + e)
 
     def close(self):
         self.sftp_connect.close()
@@ -151,4 +150,3 @@ if __name__ == "__main__":
                 sftp_backup.upload_file(remotepath, data_dict["LOCAL_PATH"])
             else:
                 print(f"バックアップする「{data_dict['LOCAL_PATH']}」が存在しません！")
-
