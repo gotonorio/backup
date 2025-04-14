@@ -103,9 +103,9 @@ if __name__ == "__main__":
     PORT = port_number
     USER = user_name
     KEY_FILE = id_rsa
-    PASSPHRASE = passphrase（「""」を設定で、パスフレーズ無しの秘密鍵に対応）
+    PASSPHRASE = ""（パスフレーズ無しの秘密鍵に対応）
     REMOTE_PATH = remote_filename（LOCAL_PATHに日時を追加して、拡張子をzipに置き換えてアップロードする）
-    LOCAL_PATH = local_filename（バックアップするファイル名）
+    LOCAL_PATH = local_filename（バックアップするfullpathのファイル名）
     """
     # config_fileを読み込むためにargparseを設定する
     try:
