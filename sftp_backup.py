@@ -5,6 +5,7 @@ Programming by N.Goto 2025-03-22
     1. localサーバからremoteサーバに秘密鍵でssh接続できること。
     2. remoteサーバにはバックアップファイル用のディレクトリが存在すること。
     3. ファイル名はremote側もlocal側もFullpathで指定すること。
+    4. バックアップファイルが貯まる一方なので、整理を忘れないこと。
 """
 
 import argparse
@@ -27,7 +28,8 @@ class SftpBackup:
 
     def __init__(self, host, port, user, auth_data):
         """クラスが生成された時に最初に呼ばれる
-        - サーバ接続のためパスフレーズ無し
+        - ここで、remoteサーバへ秘密鍵によるssh接続させる.
+        - サーバ接続のためパスフレーズ無し.
         """
         # 接続情報
         self.host = host
