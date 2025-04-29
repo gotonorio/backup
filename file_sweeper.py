@@ -2,36 +2,6 @@ import argparse
 import os
 from datetime import datetime, timedelta
 
-"""
-# 対象ディレクトリ
-target_dir = "/home/ngoto/backup_sophiag"
-
-# 対象とする拡張子（小文字で指定、複数指定もOK！）
-target_extensions = [
-    ".zip",
-]
-
-# しきい値（ここでは3ヶ月前）
-threshold = datetime.now() - timedelta(days=90)
-
-# ディレクトリ内のファイルをすべて見る
-for filename in os.listdir(target_dir):
-    file_path = os.path.join(target_dir, filename)
-
-    if os.path.isfile(file_path):
-        # ファイルの拡張子を取得
-        _, ext = os.path.splitext(filename)
-
-        # 拡張子を小文字化して比較してファイルの作成時刻を取得
-        if ext.lower() in target_extensions:
-            created_time = datetime.fromtimestamp(os.path.getctime(file_path))
-
-        # しきい値よりも古ければ削除
-        if created_time < threshold:
-            print(f"Deleting {file_path} (created: {created_time})")
-            os.remove(file_path)
-"""
-
 
 class FileSweeper:
     def __init__(self, target_dir, extensions=None, days_old=90, dry_run=False):
@@ -67,14 +37,23 @@ class FileSweeper:
 
 
 def parse_args():
+    # ヘルプ画面での説明文を設定しながらargparseのインスタンスを生成
     parser = argparse.ArgumentParser(description="Sweep old files safely.")
+
+    # (1) target_dir引数の設定
     parser.add_argument("--target_dir", type=str, required=True, help="Target directory to clean.")
+
+    # (2) extension（削除するファイルの拡張子）引数の設定 
     parser.add_argument(
         "--extensions", type=str, nargs="*", default=[], help="File extensions to target (e.g., .log .txt)."
     )
+
+    # (3) days_old（削除するファイルの作成日。デフォルトは90日以前）
     parser.add_argument(
         "--days_old", type=int, default=90, help="Delete files older than this number of days (default: 90)."
     )
+
+    # (4) dry_run（テスト用引数）
     parser.add_argument(
         "--dry_run",
         action="store_true",
@@ -84,8 +63,10 @@ def parse_args():
 
 
 def main():
+    # コマンドライン引数の読み込み・解析
     args = parse_args()
 
+    # FileSweeperクラスのインスタンス生成
     sweeper = FileSweeper(
         target_dir=args.target_dir, extensions=args.extensions, days_old=args.days_old, dry_run=args.dry_run
     )
